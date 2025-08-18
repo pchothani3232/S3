@@ -115,6 +115,7 @@ namespace DatabaseConfiguration
             if (!string.IsNullOrEmpty(searchText))
             {
                 /* Generic*/
+                /*
                 sqlparam obj = new sqlparam();
                 obj.status = "SearchByNameAndMobileNo";
                 obj.MobileNumber = searchText;
@@ -123,10 +124,11 @@ namespace DatabaseConfiguration
 
                 dataGridView1.DataSource = dt;
                 dataGridView1.Visible = true;
+                */
                
 
 
-                /*
+                
                 SqlCommand cmd = new SqlCommand("SalesInvoice_Sp", con);
                 cmd.CommandType = CommandType.StoredProcedure;
 
@@ -140,7 +142,7 @@ namespace DatabaseConfiguration
 
                 dataGridView1.Visible = true;
                 con.Close();
-                */
+                
               
             }
             else
@@ -169,10 +171,11 @@ namespace DatabaseConfiguration
                 return;
             }
 
-            /*
+           
             // Clear old product data
             ClearProductData();
 
+            /*
             // Create and configure command
 
             SqlCommand cmd = new SqlCommand("Product_Sp", con);
@@ -694,6 +697,8 @@ namespace DatabaseConfiguration
                     using (SqlCommand cmd = new SqlCommand("USP_usermaster", con))
                     {
                         cmd.CommandType = CommandType.StoredProcedure;
+
+                      
                         cmd.Parameters.AddWithValue("@Status", "getuserinfo");
                         cmd.Parameters.AddWithValue("@MobileNo", txtCustomerMobileNo.Text.Trim());
                         cmd.Parameters.AddWithValue("@CustomerName", txtCustomerName.Text.Trim());
