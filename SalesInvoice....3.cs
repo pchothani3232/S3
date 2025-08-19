@@ -115,19 +115,20 @@ namespace DatabaseConfiguration
             if (!string.IsNullOrEmpty(searchText))
             {
                 /* Generic*/
-               
+                
                 sqlparam obj = new sqlparam();
                 obj.status = "SearchByNameAndMobileNo";
                 obj.MobileNumber = searchText;
-                obj.MobileNumber = searchText;
+                obj.CustomerName = searchText;
                 DataTable dt = CommonHelper.GetDataTable("SalesInvoice_Sp", obj);
 
                 dataGridView1.DataSource = dt;
                 dataGridView1.Visible = true;
+                
 
 
 
-                /*
+               /*
                SqlCommand cmd = new SqlCommand("SalesInvoice_Sp", con);
                cmd.CommandType = CommandType.StoredProcedure;
 
@@ -142,6 +143,7 @@ namespace DatabaseConfiguration
                dataGridView1.Visible = true;
                con.Close();
                */
+               
 
 
 
