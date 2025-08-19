@@ -30,7 +30,6 @@ BEGIN
 
 	WHERE	(@Status='SearchByCode' AND Product_Code like  @Product_Name + '%') OR
 			(@Status='SearchByName' AND Product_Name like  @Product_Name +'%')
-
 	--IF @Status='SearchByCode'
 	--BEGIN
 	--	select * from Product where Product_Code like  @Product_Code + '%' ;
