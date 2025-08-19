@@ -1,6 +1,6 @@
 USE [DatabaseConfiguration1]
 GO
-/****** Object:  StoredProcedure [dbo].[Product_Sp]    Script Date: 17-08-2025 21:12:29 ******/
+/****** Object:  StoredProcedure [dbo].[Product_Sp]    Script Date: 18-08-2025 22:18:55 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -25,8 +25,12 @@ BEGIN
 	FROM	Product (NOLOCK) P
 		LEFT JOIN	stock (NOLOCK) S
 	ON		P.Product_Id = S.Stk_mm_id
-	WHERE	(@Status='SearchByCode' AND Product_Code like  @Product_Code + '%') OR
+	--WHERE	(@Status='SearchByCode' AND Product_Code like  @Product_Code + '%') OR
+	--		(@Status='SearchByName' AND Product_Name like  @Product_Name +'%')
+
+	WHERE	(@Status='SearchByCode' AND Product_Code like  @Product_Name + '%') OR
 			(@Status='SearchByName' AND Product_Name like  @Product_Name +'%')
+
 	--IF @Status='SearchByCode'
 	--BEGIN
 	--	select * from Product where Product_Code like  @Product_Code + '%' ;
