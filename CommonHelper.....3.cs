@@ -167,7 +167,7 @@ namespace DatabaseConfiguration
 
         public string Product_Name { get; set; }
 
-        public string Product_Code { get; set; }
+        //public string Product_Code { get; set; }
 
 
     }
