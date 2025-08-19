@@ -126,19 +126,12 @@ namespace DatabaseConfiguration
         //2 :  It(GetStoredProcedureParameters) finds out what parameters exist in the given stored procedure.
         private static DataTable GetStoredProcedureParameters(string spName)
         {
-            string sql = @"
-            SELECT
-                PARAMETER_NAME,
-                PARAMETER_MODE,
-                DATA_TYPE
-            FROM INFORMATION_SCHEMA.PARAMETERS
-            WHERE SPECIFIC_NAME = @SPName
-            ORDER BY ORDINAL_POSITION";
             using (SqlConnection con = new SqlConnection(CommClass.Connection))
             {
                 con.Open();
-                using (SqlCommand cmd = new SqlCommand(sql, con))
+                using (SqlCommand cmd = new SqlCommand("USP_GetStoredProcedureParameters", con))
                 {
+                    cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@SPName", spName);
 
                     DataTable dt = new DataTable();
