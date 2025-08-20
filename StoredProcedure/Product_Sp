@@ -1,6 +1,6 @@
 USE [DatabaseConfiguration1]
 GO
-/****** Object:  StoredProcedure [dbo].[Product_Sp]    Script Date: 18-08-2025 22:18:55 ******/
+/****** Object:  StoredProcedure [dbo].[Product_Sp]    Script Date: 19-08-2025 22:53:11 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -23,7 +23,7 @@ BEGIN
 			P.Product_SalesRate,
 			ISNULL(S.Stk_Qty,0) AS Product_AvailableQty
 	FROM	Product (NOLOCK) P
-		LEFT JOIN	stock (NOLOCK) S
+		INNER JOIN	stock (NOLOCK) S
 	ON		P.Product_Id = S.Stk_mm_id
 	--WHERE	(@Status='SearchByCode' AND Product_Code like  @Product_Code + '%') OR
 	--		(@Status='SearchByName' AND Product_Name like  @Product_Name +'%')
