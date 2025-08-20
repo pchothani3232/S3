@@ -1,6 +1,6 @@
 USE [DatabaseConfiguration1]
 GO
-/****** Object:  StoredProcedure [dbo].[StateMaster_Sp]    Script Date: 17-08-2025 21:13:59 ******/
+/****** Object:  StoredProcedure [dbo].[StateMaster_Sp]    Script Date: 19-08-2025 22:55:13 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
