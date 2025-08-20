@@ -198,10 +198,8 @@ namespace DatabaseConfiguration
 
         public int ProductQty { get; set; }
 
+        public decimal SalesInvoiceNumber { get; set; }
+
     }
-
-
-    
-
 
 }
