@@ -1,6 +1,6 @@
 USE [DatabaseConfiguration1]
 GO
-/****** Object:  StoredProcedure [dbo].[USP_GetStoredProcedureParameters]    Script Date: 18-08-2025 23:53:43 ******/
+/****** Object:  StoredProcedure [dbo].[USP_GetStoredProcedureParameters]    Script Date: 19-08-2025 22:55:34 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
