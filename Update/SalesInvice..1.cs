@@ -10,7 +10,7 @@ namespace DatabaseConfiguration
 {
     public partial class SalesInvoice : Form
     {
-        SqlConnection con = new SqlConnection(CommClass.Connection);
+        //SqlConnection con = new SqlConnection(CommClass.Connection);
 
         int cutId = 0;
         public SalesInvoice()
@@ -34,6 +34,8 @@ namespace DatabaseConfiguration
             AutogenerateCode();
             dataGridView2.Visible = false;
         }
+
+
 
         //void fillCombobox()
         //{
@@ -60,6 +62,7 @@ namespace DatabaseConfiguration
 
         void AutogenerateCode()
         {
+            /*
             con.Open();
             SqlCommand cmd = new SqlCommand("SalesInvoice_Sp", con);  //LoginCredential = stored procedure name
             cmd.CommandType = CommandType.StoredProcedure;
@@ -72,6 +75,17 @@ namespace DatabaseConfiguration
             // Show result in textbox
             txtSalesInvoiceNo.Text = p.Value.ToString();
             con.Close();
+            */
+
+            sqlparam AutogenerateCode = new sqlparam();
+            AutogenerateCode.status = "SalesInvoiceNumber";
+
+            DataTable dt = CommonHelper.GetDataTable("SalesInvoice_Sp", AutogenerateCode);
+
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                txtSalesInvoiceNo.Text = dt.Rows[0]["SalesInvoiceNumber"].ToString();
+            }
         }
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
@@ -885,9 +899,10 @@ namespace DatabaseConfiguration
                         cmd.ExecuteNonQuery();
                     }
                     */
-
+                    /*
                     sqlparam DeleteEmptyStock = new sqlparam();
                     DataTable DeleteEmptyStk = CommonHelper.GetDataTable("USP_DeleteZeroQtyProducts", DeleteEmptyStock);
+                    */
                 }
             }
             catch (Exception ex)
