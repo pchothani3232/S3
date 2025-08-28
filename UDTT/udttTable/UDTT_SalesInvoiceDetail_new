@@ -1,0 +1,12 @@
+create type UDTT_SalesInvoiceDetail_new as table
+(
+	 sid_SIH_id BIGINT  NULL,
+     sid_mm_id BIGINT  NULL,
+     sid_Qty NUMERIC(18,2) NULL,
+     sid_FreeQty NUMERIC(18,2)  NULL,
+     sid_Discount NUMERIC(18,2) NULL,
+     sid_DiscountAmt NUMERIC(18,2)  NULL,
+     sid_SubTotal NUMERIC(18,2)  NULL,
+     sid_NetAmount NUMERIC(18,2) NULL
+)
+
