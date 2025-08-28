@@ -130,3 +130,111 @@ Show error if something fails.
 
 👉 This is the correct way to use Table-Valued Parameters (TVP) in C#.
 It reduces multiple database calls and makes your code faster and cleaner.
+
+
+
+
+
+
+
+
+
+
+
+
+===================================================================================================================
+
+
+
+                /*
+                // 4. Insert Invoice Details & Stock Updates
+                if (sih_id > 0)
+                {
+                    foreach (DataGridViewRow row in SalesInvoiceDetailDGV.Rows.Cast<DataGridViewRow>().Where(r => !r.IsNewRow))
+                    {
+                        // Insert Invoice Detail
+
+                        sqlparam InsertInvoice = new sqlparam();
+
+                        InsertInvoice.sid_SIH_id = sih_id;
+                        InsertInvoice.sid_mm_id = Convert.ToInt32(row.Cells["ProductCode"].Value);
+                        InsertInvoice.sid_Qty = Convert.ToInt32(row.Cells["ProductQty"].Value);
+                        InsertInvoice.sid_FreeQty = Convert.ToInt32(row.Cells["ProductFreeQty"].Value);
+                        InsertInvoice.sid_Discount = Convert.ToDecimal(row.Cells["Product_DiscountPercentage"].Value);
+                        InsertInvoice.sid_DiscountAmt = Convert.ToDecimal(row.Cells["ProductDiscount"].Value);
+                        InsertInvoice.sid_SubTotal = Convert.ToDecimal(row.Cells["ProductSubTotal"].Value);
+                        InsertInvoice.sid_NetAmount = Convert.ToDecimal(row.Cells["ProductNetAmount"].Value);
+
+                        DataTable dtInvoice = CommonHelper.GetDataTable("SP_SalesInvoiceDetail_new", InsertInvoice);
+
+
+                        // Update Stock                      
+                        sqlparam UpdateStock = new sqlparam();
+
+                        UpdateStock.ProductCode = Convert.ToInt32(row.Cells["ProductCode"].Value);
+                        UpdateStock.ProductQty = Convert.ToInt32(row.Cells["ProductQty"].Value ?? 0) +
+                                                 Convert.ToInt32(row.Cells["ProductFreeQty"].Value ?? 0);
+
+                        DataTable UpdateStk = CommonHelper.GetDataTable("SP_stock", UpdateStock);
+                    }
+                }
+                  */
+           
+
+
+
+
+                if (sih_id > 0)
+                {
+                    // 1. Create DataTable matching UDTT
+                    DataTable invoiceDetails = new DataTable();
+                    invoiceDetails.Columns.Add("sid_SIH_id", typeof(long));
+                    invoiceDetails.Columns.Add("sid_mm_id", typeof(long));
+                    invoiceDetails.Columns.Add("sid_Qty", typeof(decimal));
+                    invoiceDetails.Columns.Add("sid_FreeQty", typeof(decimal));
+                    invoiceDetails.Columns.Add("sid_Discount", typeof(decimal));
+                    invoiceDetails.Columns.Add("sid_DiscountAmt", typeof(decimal));
+                    invoiceDetails.Columns.Add("sid_SubTotal", typeof(decimal));
+                    invoiceDetails.Columns.Add("sid_NetAmount", typeof(decimal));
+
+                    // 2. Loop through DataGridView rows and add to DataTable
+                    foreach (DataGridViewRow row in SalesInvoiceDetailDGV.Rows.Cast<DataGridViewRow>().Where(r => !r.IsNewRow))
+                    {
+                        invoiceDetails.Rows.Add(
+                            sih_id,   // sid_SIH_id
+                            Convert.ToInt64(row.Cells["ProductCode"].Value),
+                            Convert.ToDecimal(row.Cells["ProductQty"].Value ?? 0),
+                            Convert.ToDecimal(row.Cells["ProductFreeQty"].Value ?? 0),
+                            Convert.ToDecimal(row.Cells["Product_DiscountPercentage"].Value ?? 0),
+                            Convert.ToDecimal(row.Cells["ProductDiscount"].Value ?? 0),
+                            Convert.ToDecimal(row.Cells["ProductSubTotal"].Value ?? 0),
+                            Convert.ToDecimal(row.Cells["ProductNetAmount"].Value ?? 0)
+                        );
+                    }
+
+                    // 3. Call stored procedure with TVP
+                    using (SqlConnection con = new SqlConnection(CommClass.Connection))
+                    using (SqlCommand cmd = new SqlCommand("SP_SalesInvoiceDetail_new", con))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+
+                        SqlParameter tvpParam = cmd.Parameters.AddWithValue("@SalesInvoiceDetail", invoiceDetails);
+                        tvpParam.SqlDbType = SqlDbType.Structured;  // Important!
+                        tvpParam.TypeName = "UDTT_SalesInvoiceDetail_new"; // Your table type name
+
+                        con.Open();
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    // 4. After inserting invoice details, you can update stock separately
+                    foreach (DataGridViewRow row in SalesInvoiceDetailDGV.Rows.Cast<DataGridViewRow>().Where(r => !r.IsNewRow))
+                    {
+                        sqlparam UpdateStock = new sqlparam();
+                        UpdateStock.ProductCode = Convert.ToInt32(row.Cells["ProductCode"].Value);
+                        UpdateStock.ProductQty = Convert.ToInt32(row.Cells["ProductQty"].Value ?? 0) +
+                                                 Convert.ToInt32(row.Cells["ProductFreeQty"].Value ?? 0);
+
+                        DataTable UpdateStk = CommonHelper.GetDataTable("SP_stock", UpdateStock);
+                    }
+                }
+            }
