@@ -1,0 +1,132 @@
+Purpose of This Code
+
+You want to insert invoice detail records (line items like product, quantity, discount, etc.) from your DataGridView into the database.
+
+Instead of inserting each row one by one with multiple calls, you are using SQL Table-Valued Parameters (TVP) (UDTT_SalesInvoiceDetail_new) to send all rows in one go to your stored procedure SP_SalesInvoiceDetail_new.
+
+After inserting, you also update stock quantities for each product.
+
+Step by Step Explanation
+✅ Step 1: Check sih_id
+if (sih_id > 0)
+
+
+sih_id = Sales Invoice Header ID (main invoice reference).
+
+This check ensures that you only insert details if the invoice header is already created.
+
+✅ Step 2: Create a DataTable in C#
+DataTable invoiceDetails = new DataTable();
+invoiceDetails.Columns.Add("sid_SIH_id", typeof(long));
+invoiceDetails.Columns.Add("sid_mm_id", typeof(long));
+invoiceDetails.Columns.Add("sid_Qty", typeof(decimal));
+invoiceDetails.Columns.Add("sid_FreeQty", typeof(decimal));
+invoiceDetails.Columns.Add("sid_Discount", typeof(decimal));
+invoiceDetails.Columns.Add("sid_DiscountAmt", typeof(decimal));
+invoiceDetails.Columns.Add("sid_SubTotal", typeof(decimal));
+invoiceDetails.Columns.Add("sid_NetAmount", typeof(decimal));
+
+
+This DataTable is designed to exactly match your SQL User Defined Table Type:
+UDTT_SalesInvoiceDetail_new.
+
+Each column type (long, decimal) must match SQL column types.
+
+✅ Step 3: Fill DataTable from DataGridView
+foreach (DataGridViewRow row in SalesInvoiceDetailDGV.Rows.Cast<DataGridViewRow>().Where(r => !r.IsNewRow))
+{
+    invoiceDetails.Rows.Add(
+        sih_id,   // sid_SIH_id
+        Convert.ToInt64(row.Cells["ProductCode"].Value),
+        Convert.ToDecimal(row.Cells["ProductQty"].Value ?? 0),
+        Convert.ToDecimal(row.Cells["ProductFreeQty"].Value ?? 0),
+        Convert.ToDecimal(row.Cells["Product_DiscountPercentage"].Value ?? 0),
+        Convert.ToDecimal(row.Cells["ProductDiscount"].Value ?? 0),
+        Convert.ToDecimal(row.Cells["ProductSubTotal"].Value ?? 0),
+        Convert.ToDecimal(row.Cells["ProductNetAmount"].Value ?? 0)
+    );
+}
+
+
+Loops through all rows of your invoice detail DataGridView.
+
+For each row, it adds a record into invoiceDetails.
+
+Uses ?? 0 so if a cell is NULL/empty, it becomes 0 instead of crashing.
+
+Now you have all invoice details in memory (in the DataTable).
+
+✅ Step 4: Send DataTable to SQL (TVP)
+using (SqlConnection con = new SqlConnection(CommClass.Connection))
+using (SqlCommand cmd = new SqlCommand("SP_SalesInvoiceDetail_new", con))
+{
+    cmd.CommandType = CommandType.StoredProcedure;
+
+    SqlParameter tvpParam = cmd.Parameters.AddWithValue("@SalesInvoiceDetail", invoiceDetails);
+    tvpParam.SqlDbType = SqlDbType.Structured;  
+    tvpParam.TypeName = "UDTT_SalesInvoiceDetail_new"; 
+
+    con.Open();
+    cmd.ExecuteNonQuery();
+}
+
+
+Opens DB connection.
+
+Calls your stored procedure SP_SalesInvoiceDetail_new.
+
+Passes the whole DataTable as @SalesInvoiceDetail.
+
+SqlDbType.Structured is required for Table-Valued Parameters.
+
+TypeName must match your SQL Type name (UDTT_SalesInvoiceDetail_new).
+
+Executes one insert for all rows (much faster than looping row by row).
+
+✅ Step 5: Update Stock
+foreach (DataGridViewRow row in SalesInvoiceDetailDGV.Rows.Cast<DataGridViewRow>().Where(r => !r.IsNewRow))
+{
+    sqlparam UpdateStock = new sqlparam();
+    UpdateStock.ProductCode = Convert.ToInt32(row.Cells["ProductCode"].Value);
+    UpdateStock.ProductQty = Convert.ToInt32(row.Cells["ProductQty"].Value ?? 0) +
+                             Convert.ToInt32(row.Cells["ProductFreeQty"].Value ?? 0);
+
+    DataTable UpdateStk = CommonHelper.GetDataTable("SP_stock", UpdateStock);
+}
+
+
+After saving invoice details, stock is reduced.
+
+For each row:
+
+Reads ProductCode.
+
+Reads total quantity (Qty + FreeQty).
+
+Calls your stored procedure SP_stock to update product stock.
+
+✅ Step 6: Error Handling
+catch (Exception ex)
+{
+    MessageBox.Show("Data Searching or insertion Error: " + ex.Message);
+}
+
+
+If anything goes wrong (DB connection, wrong datatype, etc.), it shows an error message.
+
+Summary in Simple Words
+
+Check if invoice header exists (sih_id > 0).
+
+Create a DataTable that looks like your SQL table type.
+
+Fill that DataTable from DataGridView rows.
+
+Send the whole DataTable to SQL in one call (faster).
+
+Update stock for each product separately.
+
+Show error if something fails.
+
+👉 This is the correct way to use Table-Valued Parameters (TVP) in C#.
+It reduces multiple database calls and makes your code faster and cleaner.
